@@ -47,7 +47,7 @@ def save_samples(gen_audio_1, gen_audio_2, output_dir, sr, class_name_1, class_n
     for j in range(combined_samples.shape[0]):
         combined_sample = combined_samples[j].cpu()
         combined_sample = high_pass_filter(combined_sample)
-        write(f"{output_dir}/{class_name_1}_{class_name_2}_combined_{str(j+1).zfill(3)}.wav", sr, combined_sample)
+        write(f"{output_dir}/{class_name_1}_{class_name_2}_combined_{alpha}_{str(j+1).zfill(3)}.wav", sr, combined_sample)
 
 def main(args):
     os.makedirs(args.output_dir, exist_ok=True)
@@ -92,9 +92,9 @@ if __name__ == '__main__':
     parser.add_argument('--target_audio_path_2', type=str, required=True, help='Path to the second target audio file.')
     parser.add_argument('--class_name_1', type=str, required=True, help='First class name for generating samples.', choices=LABELS)
     parser.add_argument('--class_name_2', type=str, required=True, help='Second class name for generating samples.', choices=LABELS)
-    parser.add_argument('--output_dir', type=str, default="./results")
+    parser.add_argument('--output_dir', type=str, default="./results_idea_1")
     parser.add_argument('--cond_scale', type=int, default=3)
-    parser.add_argument('--N', type=int, default=3)
+    parser.add_argument('--N', type=int, default=1)
     parser.add_argument('--alpha', type=float, default=0.5, help='Weighting factor for combining gen_audio_1 and gen_audio_2.')
     args = parser.parse_args()
     
