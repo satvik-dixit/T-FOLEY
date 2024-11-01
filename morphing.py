@@ -39,17 +39,17 @@ def generate_samples(target_event, class_idx1, class_idx2, sampler, cond_scale, 
     
     return gen_audio_1, gen_audio_2
 
-def save_samples(gen_audio_1, gen_audio_2, target_audio, output_dir, sr, class_name_1, class_name_2, alpha):
+def save_samples(gen_audio_1, gen_audio_2, target_audio, output_dir, sr, class_name_1, class_name_2, beta):
     # Save the target audio
     sf.write(f"{output_dir}/target_audio.wav", target_audio.cpu().numpy(), sr)
     
-    # Direct summation with user-defined alpha
-    combined_samples = alpha * gen_audio_1 + (1 - alpha) * gen_audio_2
+    # Direct summation with user-defined beta
+    combined_samples = beta * gen_audio_1 + (1 - beta) * gen_audio_2
     
     for j in range(combined_samples.shape[0]):
         combined_sample = combined_samples[j].cpu()
         combined_sample = high_pass_filter(combined_sample)
-        write(f"{output_dir}/{class_name_1}_{class_name_2}_combined_{alpha}_{str(j+1).zfill(3)}.wav", sr, combined_sample)
+        write(f"{output_dir}/{class_name_1}_{class_name_2}_combined_{beta}_{str(j+1).zfill(3)}.wav", sr, combined_sample)
 
 def main(args):
     os.makedirs(args.output_dir, exist_ok=True)
@@ -84,7 +84,7 @@ def main(args):
     gen_audio_1, gen_audio_2 = generate_samples(target_event, class_idx1, class_idx2, sampler, args.cond_scale, device, args.N, audio_length)
     
     # Save target and generated samples
-    save_samples(gen_audio_1, gen_audio_2, target_audio, args.output_dir, sample_rate, args.class_name_1, args.class_name_2, args.alpha)
+    save_samples(gen_audio_1, gen_audio_2, target_audio, args.output_dir, sample_rate, args.class_name_1, args.class_name_2, args.beta)
     print('Done!')
 
 if __name__ == '__main__':
@@ -97,7 +97,7 @@ if __name__ == '__main__':
     parser.add_argument('--output_dir', type=str, default="./results_idea_2")
     parser.add_argument('--cond_scale', type=int, default=3)
     parser.add_argument('--N', type=int, default=1)
-    parser.add_argument('--alpha', type=float, default=0.5, help='Weighting factor for combining gen_audio_1 and gen_audio_2.')
+    parser.add_argument('--beta', type=float, default=0.5, help='Weighting factor for combining gen_audio_1 and gen_audio_2.')
     args = parser.parse_args()
     
     main(args)
