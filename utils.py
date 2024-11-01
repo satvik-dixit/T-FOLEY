@@ -39,7 +39,7 @@ def get_onset(y, sr=22050):
     return torch.tensor(onsets, dtype=torch.float32)
 
 def resample_audio(audio, original_sr, target_sr):
-    resampler = T.transforms.Resample(original_sr, target_sr, resampling_method='sinc_interpolation')
+    resampler = T._transforms.Resample(original_sr, target_sr, resampling_method='sinc_interpolation')
     return resampler(audio)
 
 def adjust_audio_length(audio, length):
