@@ -39,17 +39,28 @@ def generate_samples(target_event, class_idx1, class_idx2, sampler, cond_scale, 
     
     return gen_audio_1, gen_audio_2
 
-def save_samples(gen_audio_1, gen_audio_2, target_audio, output_dir, sr, class_name_1, class_name_2, beta):
+def save_samples(gen_audio_1, gen_audio_2, target_audio, output_dir, sr, class_name_1, class_name_2, alpha):
     # Save the target audio
     sf.write(f"{output_dir}/target_audio.wav", target_audio.cpu().numpy(), sr)
     
-    # Direct summation with user-defined beta
-    combined_samples = beta * gen_audio_1 + (1 - beta) * gen_audio_2
+    # Direct summation with user-defined alpha
+    combined_samples = alpha * gen_audio_1 + (1 - alpha) * gen_audio_2
+
+    # Create or overwrite the 'audio_to_display' directory
+    display_dir = "audio_to_display"
+    os.makedirs(display_dir, exist_ok=True)
     
     for j in range(combined_samples.shape[0]):
         combined_sample = combined_samples[j].cpu()
         combined_sample = high_pass_filter(combined_sample)
-        write(f"{output_dir}/{class_name_1}_{class_name_2}_combined_{beta}_{str(j+1).zfill(3)}.wav", sr, combined_sample)
+        
+        # Save the combined sample in the output directory as before
+        output_path = f"{output_dir}/{class_name_1}_{class_name_2}_combined_{alpha}_{str(j+1).zfill(3)}.wav"
+        write(output_path, sr, combined_sample)
+        
+        # Save or replace 'latest.wav' in the 'audio_to_display' directory
+        display_path = os.path.join(display_dir, "latest.wav")
+        write(display_path, sr, combined_sample)
 
 def main(args):
     os.makedirs(args.output_dir, exist_ok=True)
@@ -94,7 +105,7 @@ if __name__ == '__main__':
     parser.add_argument('--target_audio_path', type=str, required=True, help='Path to the target audio file.')
     parser.add_argument('--class_name_1', type=str, required=True, help='First class name for generating samples.', choices=LABELS)
     parser.add_argument('--class_name_2', type=str, required=True, help='Second class name for generating samples.', choices=LABELS)
-    parser.add_argument('--output_dir', type=str, default="./results_idea_2")
+    parser.add_argument('--output_dir', type=str, default="./results")
     parser.add_argument('--cond_scale', type=int, default=3)
     parser.add_argument('--N', type=int, default=1)
     parser.add_argument('--beta', type=float, default=0.5, help='Weighting factor for combining gen_audio_1 and gen_audio_2.')
