@@ -50,17 +50,28 @@ def save_samples(gen_audio_1, gen_audio_2, target_audio, output_dir, sr, class_n
     display_dir = "audio_to_display"
     os.makedirs(display_dir, exist_ok=True)
     
+    # Create directories for individual generated audio files
+    gen_audio_1_dir = "gen_audio_1"
+    gen_audio_2_dir = "gen_audio_2"
+    os.makedirs(gen_audio_1_dir, exist_ok=True)
+    os.makedirs(gen_audio_2_dir, exist_ok=True)
+
+    # Save individual generated audio files
+    sf.write(f"{gen_audio_1_dir}/gen_audio_file_1.wav", gen_audio_1.cpu().numpy(), sr)
+    sf.write(f"{gen_audio_2_dir}/gen_audio_file_1_2.wav", gen_audio_2.cpu().numpy(), sr)
+
     for j in range(combined_samples.shape[0]):
         combined_sample = combined_samples[j].cpu()
         combined_sample = high_pass_filter(combined_sample)
         
-        # Save the combined sample in the output directory as before
+        # Save the combined sample in the output directory
         output_path = f"{output_dir}/{class_name_1}_{class_name_2}_combined_{alpha}.wav"
         write(output_path, sr, combined_sample)
         
         # Save or replace 'latest.wav' in the 'audio_to_display' directory
         display_path = os.path.join(display_dir, "latest.wav")
         write(display_path, sr, combined_sample)
+
 
 def main(args):
     os.makedirs(args.output_dir, exist_ok=True)
