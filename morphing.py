@@ -55,7 +55,7 @@ def save_samples(gen_audio_1, gen_audio_2, target_audio, output_dir, sr, class_n
         combined_sample = high_pass_filter(combined_sample)
         
         # Save the combined sample in the output directory as before
-        output_path = f"{output_dir}/{class_name_1}_{class_name_2}_combined_{alpha}_{str(j+1).zfill(3)}.wav"
+        output_path = f"{output_dir}/{class_name_1}_{class_name_2}_combined_{alpha}.wav"
         write(output_path, sr, combined_sample)
         
         # Save or replace 'latest.wav' in the 'audio_to_display' directory
